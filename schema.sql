@@ -1,0 +1,23 @@
+DROP TABLE IF EXISTS users;
+CREATE TABLE users (
+	uid SERIAL PRIMARY KEY,
+	firstname VARCHAR(60) NOT NULL,
+	lastname VARCHAR(60) NOT NULL,
+	email VARCHAR(60) NOT NULL UNIQUE,
+	passwordhash VARCHAR(100) NOT NULL
+);
+
+DROP TABLE IF EXISTS words;
+CREATE TABLE words (
+	wid SERIAL PRIMARY KEY,
+	english VARCHAR(60) NOT NULL,
+	chinese VARCHAR(60) NOT NULL,
+	pinyin VARCHAR(60)
+);
+
+DROP TABLE IF EXISTS userwords;
+CREATE TABLE userwords (
+	pid SERIAL PRIMARY KEY,
+	userid INTEGER REFERENCES users(uid),
+	wordid INTEGER REFERENCES words(wid)
+);

@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+{% block scripts %}
+<script type="text/javascript">
+  function flipCard(sideToShow) {
+    if (sideToShow=='english') {
+      $('.translation-english').css('display','block');
+      $('.translation-chinese').css('display','none');
+      $('.translation-pinyin').css('display','none');
+    } else if (sideToShow=='chinese') {
+      $('.translation-english').css('display','none');
+      $('.translation-chinese').css('display','block');
+      $('.translation-pinyin').css('display','block');
+    }
+  }
+
+  var language = '{{ language }}';
+
+  $(document).ready(function() {
+
+    flipCard(language);
+
+    $('.flash-card').click(function() {
+      console.log('click!');
+      if (language == 'english') {
+        language = 'chinese';
+      } else if (language == 'chinese') {
+        language = 'english';
+      }
+      flipCard(language);
+    });
+
+
+  });
+</script>
+
+{% endblock %}
+
+{% block content %}
+<main class="container">
+  <div class="title-bar">Flashr</div>
+  <div class="flash-card">
+    <div class="navigation-button-prev"></div>
+    <div class="navigation-button-next"></div>
+    <div class="flash-card-word">
+      <span class="translation-english">{{ word.english.upper() }}</span>
+      <span class="translation-chinese">{{ word.chinese.replace(' ','') }}</span>
+      <span class="translation-pinyin">({{ word.pinyin }})</span>
+    </div>
+  </div>
+</main>
+
+
+
+{% endblock %}
