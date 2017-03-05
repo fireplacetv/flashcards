@@ -21,4 +21,11 @@ class Word(db.Model):
 	def setChinese(chinese):
 		self.chinese = chinese
 		self.pinyin = pinyin.get(chinese)
+
+	def serialize(self):
+		return {
+			'english': self.english,
+			'chinese': self.chinese,
+			'pinyin': self.pinyin
+		}
 		

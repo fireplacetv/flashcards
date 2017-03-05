@@ -2,35 +2,73 @@
 
 {% block scripts %}
 <script type="text/javascript">
-  function flipCard(sideToShow) {
-    if (sideToShow=='english') {
+  function displayCard() {
+    if (language=='english') {
       $('.translation-english').css('display','block');
       $('.translation-chinese').css('display','none');
-      $('.translation-pinyin').css('display','none');
-    } else if (sideToShow=='chinese') {
+    } else if (language=='chinese') {
       $('.translation-english').css('display','none');
       $('.translation-chinese').css('display','block');
-      $('.translation-pinyin').css('display','block');
     }
-  }
+  };
 
-  var language = '{{ language }}';
+  function setLanguage(newLanguage) {
+    language = newLanguage;
+    if (language=='english') {
+      $('#language-button').text(language);
+    } else if (language=='chinese') {
+      $('#language-button').text(language);
+    }
+  };
+
+  function setPinyin(pinyin) {
+    if (pinyin) {
+      $('.translation-pinyin').css('display', 'none');
+      $('#pinyin-button').addClass('inactive');
+    } else if (!pinyin) {
+      $('.translation-pinyin').css('display', 'block');
+      $('#pinyin-button').removeClass('inactive');
+    }
+    $('#pinyin-button').text('pinyin');
+  };
+
+  var language = "{{ session['language'] }}";
+  var displayLanguage = 'english';
+  if (language == 'chinese') {
+    displayLanguage = 'chinese';
+  }
 
   $(document).ready(function() {
 
-    flipCard(language);
+    {% if session['pinyin'] %}
+      setPinyin(true);
+    {% else %}
+      setPinyin(false);
+    {% endif %}
+    setLanguage(language);
+    displayCard();
 
-    $('.flash-card').click(function() {
-      console.log('click!');
-      if (language == 'english') {
-        language = 'chinese';
-      } else if (language == 'chinese') {
-        language = 'english';
+    if (language=='english') {
+      $('.translation-english').css('display','block');
+    } else if (language=='chinese') {
+      $('.translation-chinese').css('display','block');
+    }
+
+    $('.flash-card-word').click(function() { 
+      if (displayLanguage =='english') {
+        displayLanguage = 'chinese';
+        $('.translation-english').css('display','none');
+        $('.translation-chinese').css('display','block');
+      } else if (displayLanguage =='chinese') {
+        displayLanguage = 'english';
+        $('.translation-english').css('display','block');
+        $('.translation-chinese').css('display','none');
       }
-      flipCard(language);
     });
 
-
+    $('#pinyin-button').click(function() {
+      window.location = "{{ url_for('togglePinyin') }}";
+    });
   });
 </script>
 
@@ -38,14 +76,36 @@
 
 {% block content %}
 <main class="container">
-  <div class="title-bar">Flashr</div>
+  <div class="title-bar">
+    <span class="title">Flashr</span>
+    <a href="{{ url_for('togglePinyin') }}">
+      <span class="title-bar-button" id="pinyin-button"></span>
+    </a>
+    {% if session['language'] == 'chinese' %}
+    <a href="{{ url_for('toggleEnglish') }}">
+    {% else %}
+    <a href="{{ url_for('toggleChinese') }}">
+    {% endif %}
+      <span class="title-bar-button" id="language-button"></span>
+    </a>
+  </div>
   <div class="flash-card">
-    <div class="navigation-button-prev"></div>
-    <div class="navigation-button-next"></div>
+    <a href="{{ url_for('prevCard') }}"> 
+      <span class="navigation-button-prev">
+      </span>
+    </a>
+    <a href="{{ url_for('nextCard') }}">
+      <span class="navigation-button-next">
+      </span>
+    </a>
     <div class="flash-card-word">
-      <span class="translation-english">{{ word.english.upper() }}</span>
-      <span class="translation-chinese">{{ word.chinese.replace(' ','') }}</span>
-      <span class="translation-pinyin">({{ word.pinyin }})</span>
+      <span class="translation-english">
+        {{ word.english.upper() }}
+      </span>
+      <span class="translation-chinese">
+        {{ word.chinese.replace(' ','') }}
+        <span class="translation-pinyin">({{ word.pinyin }})</span>
+      </span>
     </div>
   </div>
 </main>

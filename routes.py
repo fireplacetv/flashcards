@@ -1,13 +1,14 @@
-from flask import Flask, render_template, request, session, redirect, url_for
+from flask import Flask, render_template, request, session,\
+ redirect, url_for, g
 from models import db, Word
 from forms import SignupForm, LoginForm, CardForm
-from random import seed,randrange
+from random import seed,randrange,shuffle
 from time import clock
 from pinyin import pinyin
 
 app = Flask(__name__)
 
-app.secret_key = "development-key"
+app.secret_key = "flashr-development-key"
 
 app.config["SQLALCHEMY_DATABASE_URI"] = 'postgresql://localhost/flashr'
 db.init_app(app)
@@ -16,7 +17,8 @@ seed(clock)
 
 @app.route("/")
 def index():
-	return render_template("index.html")
+	session.clear()
+	return redirect(url_for('viewCard'))
 
 @app.route("/add", methods=["GET","POST"])
 def addCard():
@@ -52,19 +54,69 @@ def editCard(wid):
 	elif request.method == 'GET':
 		return render_template("edit.html", word=word, form=form)
 
-@app.route("/view/<language>/<translation>")
-def viewCard(language, translation):
-	language = language.lower()
-	translation = translation.lower()
+@app.route("/view/")
+@app.route("/view")
+def viewCard():
+	if 'widlist' in session and 'position' in session:
+		wid = session['widlist'][session['position']]
+		word = Word.query.filter_by(wid=wid).first()
+	else:
+		widlist = [w.wid for w in Word.query.all()]
+		shuffle(widlist)
+		session['widlist']=widlist
 
-	print language,translation
+		session['position']=0
+		session['pinyin'] = False
+		session['language'] = 'chinese'
+
+		word = Word.query.filter_by(wid=widlist[0]).first()
+
+	return render_template("view.html",word=word)
+
+@app.route("/view/prev")
+def prevCard():
+	print session['position']
+	session['position']=(session['position'] - 1) % len(session['widlist'])
+	print session['position']
+	return redirect(url_for('viewCard'))
+
+@app.route("/view/next")
+def nextCard():
+	session['position']=(session['position'] + 1) % len(session['widlist'])
+	return redirect(url_for('viewCard'))
+
+@app.route("/pinyin")
+def togglePinyin():
+	session['pinyin'] = not session['pinyin']
+	return redirect(url_for('viewCard'))
+
+@app.route("/english")
+def toggleEnglish():
+	session['language'] = 'english'
+	return redirect(url_for('viewCard'))
+
+@app.route("/chinese")
+def toggleChinese():
+	session['language'] = 'chinese'
+	return 	redirect(url_for('viewCard'))
+
+@app.route("/view/<language>/<translation>")
+def viewSpecificCard(language, translation):
+	language = language.lower()
+	session['language'] = language.lower()
+	translation = translation.lower()
 
 	if language == 'english':
 		word = Word.query.filter_by(english=translation).first()
-		return render_template("view.html", language=language, word=word)
+		return render_template("view.html", word=word)
 	elif language == 'chinese':
 		word = Word.query.filter_by(chinese=translation).first()
-		return render_template("view.html", language=language, word=word)
+		return render_template("view.html", word=word)
+	elif language == 'wid':
+		print 'looking for word ', translation
+		word = Word.query.filter_by(wid=int(translation)).first()
+		print 'found word ', word.english, word.chinese, word.pinyin
+		return render_template("view.html", word=word)
 	else:
 		return "couldn't find word"
 

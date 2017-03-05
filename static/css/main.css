@@ -15,7 +15,22 @@
   margin: 1% 3%;
   position: relative;
   font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+}
+
+.title-bar-title {
   text-transform: uppercase;
+}
+
+.title-bar-button {
+  color: black;
+  background-color: tan;
+  margin: 0px 0.5em;
+  position: relative;
+  float: right;
+}
+
+.title-bar-button.inactive {
+  color: beige;
 }
 
 .flash-card {
@@ -27,12 +42,14 @@
 }
 
 .navigation-button-prev {
+  position: relative;
   width: 20%;
   height: 100%;
   float: left;
 }
 
 .navigation-button-next {
+  position: relative;
   width: 20%;
   height: 100%;
   float: right;
@@ -46,5 +63,24 @@
   width: 70%;
   height: 30%;
   text-align: center;
-  font-size: 50pt;
 }
+
+.translation-english {
+  font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+  font-size: 50pt;
+  display: none;
+}
+
+.translation-chinese {
+  font-family: serif;
+  font-size: 50pt;
+  display: none;
+}
+
+.translation-pinyin {
+  font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+  font-size: 25pt;  
+  display: none;
+}
+
+
