@@ -17,4 +17,4 @@ class LoginForm(FlaskForm):
 class CardForm(FlaskForm):
 	english = StringField('English', validators=[DataRequired("Please enter the english translation.")])
 	chinese = StringField('Chinese', validators=[DataRequired("Please enter the chinese translation.")])
-	submit=SubmitField("Save")
+	submit=SubmitField("Add")

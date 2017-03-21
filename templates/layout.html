@@ -10,8 +10,21 @@
     {% block scripts %}
     {% endblock %}
     
+    <main class="container">
+    <div class="title-bar">
+      <span class="title-bar-title"><a href="{{ url_for('root') }}">Flashr</a></span>
+      <!-- vocab list -->
+      <a href="{{ url_for('viewAll') }}">
+        <span class="title-bar-button" id="vocabulary-button">vocabulary</span>
+      </a>
+      {% block title %}
+      {% endblock %}
+    </div>
+    <div class="content">
     {% block content %}
     {% endblock %}
+    </div>
+    </main>
     
   </body>
 </html>

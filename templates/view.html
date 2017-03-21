@@ -24,12 +24,11 @@
   function setPinyin(pinyin) {
     if (pinyin) {
       $('.translation-pinyin').css('display', 'none');
-      $('#pinyin-button').addClass('inactive');
+      $('#pinyin-button').text('show pinyin');
     } else if (!pinyin) {
       $('.translation-pinyin').css('display', 'block');
-      $('#pinyin-button').removeClass('inactive');
+      $('#pinyin-button').text('hide pinyin');
     }
-    $('#pinyin-button').text('pinyin');
   };
 
   var language = "{{ session['language'] }}";
@@ -75,13 +74,13 @@
 
 {% endblock %}
 
-{% block content %}
-<main class="container">
-  <div class="title-bar">
-    <span class="title">Flashr</span>
+
+{% block title %}
+    <!-- pinyin button -->
     <a href="{{ url_for('togglePinyin') }}">
       <span class="title-bar-button" id="pinyin-button"></span>
     </a>
+    <!-- language toggle -->
     {% if session['language'] == 'chinese' %}
     <a href="{{ url_for('toggleEnglish') }}">
     {% else %}
@@ -89,7 +88,9 @@
     {% endif %}
       <span class="title-bar-button" id="language-button"></span>
     </a>
-  </div>
+{% endblock %}
+
+{% block content %}
   <div class="flash-card">
     <a href="{{ url_for('prevCard') }}"> 
       <span class="navigation-button-prev">
@@ -109,8 +110,4 @@
       </span>
     </div>
   </div>
-</main>
-
-
-
 {% endblock %}

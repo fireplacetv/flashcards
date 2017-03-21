@@ -15,44 +15,14 @@ db.init_app(app)
 
 seed(clock)
 
+###############
+# Flash cards #
+###############
+
 @app.route("/")
-def index():
+def root():
 	session.clear()
 	return redirect(url_for('viewCard'))
-
-@app.route("/add", methods=["GET","POST"])
-def addCard():
-	form = CardForm()
-
-	if request.method == 'POST':
-		if not form.validate():
-			return render_template("add.html", form=form)	
-		else:
-			word = Word(form.english.data.lower(), form.chinese.data.lower())
-			db.session.add(word)
-			db.session.commit()
-
-			return redirect(url_for("viewCard", language='chinese',translation=form.chinese.data))
-
-	elif request.method == 'GET':
-		return render_template("add.html", form=form)
-
-@app.route("/edit/<wid>", methods=['GET','POST'])
-def editCard(wid):
-	word = Word.query.get(wid)
-	if word == None:
-		return redirect(url_for('addCard'))
-
-	form = CardForm(obj=word);
-
-	if request.method == 'POST':
-		if not form.validate():
-			return render_template("edit.html", word=word, form=form)
-		else:
-			Word.query.get(wid).update(dict(english=form.english.data.lower(),chinese=form.chinese.data.lower(),pinyin=pinyin(form.chinese.data)))
-
-	elif request.method == 'GET':
-		return render_template("edit.html", word=word, form=form)
 
 @app.route("/view/")
 @app.route("/view")
@@ -120,10 +90,61 @@ def viewSpecificCard(language, translation):
 	else:
 		return "couldn't find word"
 
-@app.route("/index")
+#########################
+# Vocabulary management #
+#########################
+
+@app.route("/add", methods=["GET","POST"])
+def addCard():
+	form = CardForm()
+
+	if request.method == 'POST':
+		if not form.validate():
+			return render_template("add.html", form=form)	
+		else:
+			word = Word(form.english.data.lower(), form.chinese.data.lower())
+			db.session.add(word)
+			db.session.commit()
+
+			return redirect(url_for("viewCard", language='chinese',translation=form.chinese.data))
+
+	elif request.method == 'GET':
+		return render_template("add.html", form=form)
+
+@app.route("/edit/<wid>", methods=['GET','POST'])
+def editCard(wid):
+	word = Word.query.get(wid)
+	if word == None:
+		return redirect(url_for('addCard'))
+
+	form = CardForm(obj=word);
+
+	if request.method == 'POST':
+		if not form.validate():
+			return render_template("edit.html", word=word, form=form)
+		else:
+			Word.query.get(wid).update(dict(english=form.english.data.lower(),chinese=form.chinese.data.lower(),pinyin=pinyin(form.chinese.data)))
+
+	elif request.method == 'GET':
+		return render_template("edit.html", word=word, form=form)
+
+@app.route("/vocabulary", methods=["GET","POST"])
 def viewAll():
 	vocabulary = Word.query.all();
-	return render_template("vocabulary.html", vocabulary=vocabulary)
+	form = CardForm()
+
+	if request.method == 'POST':
+		if not form.validate():
+			return render_template("vocabulary.html", vocabulary=vocabulary, form=form)
+		else:
+			word = Word(form.english.data.lower(), form.chinese.data.lower())
+			db.session.add(word)
+			db.session.commit()
+			return redirect(url_for("viewAll"))
+	elif request.method == 'GET':
+		return render_template("vocabulary.html", vocabulary=vocabulary, form=form)
+
+
 
 if __name__ == "__main__":
 	app.run(debug=True, host='0.0.0.0')

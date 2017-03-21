@@ -1,26 +1,45 @@
 {% extends "layout.html" %}
 
 {% block content %}
-  <main class="about-section">
-    <div class="container">
-      
-      <div class="section-content">
-        <h2>View Flash Card</h2>
+<div class="vocabulary-list">
+<table class="vocabulary-table">
+{% for word in vocabulary %}
+  <tr>
+  <td><a href="{{ url_for('viewSpecificCard', language='english',translation=word.english) }}">{{ word.english }}</a></td>
+  <td><a href="{{ url_for('viewSpecificCard', language='chinese',translation=word.chinese) }}">{{ word.chinese }}</a></td>
+  <td><a href="{{ url_for('viewSpecificCard', language='chinese',translation=word.chinese) }}">{{ word.pinyin }}</a></td>
+  </tr>
+{% endfor %}
+  <tr>
+    <form method="POST" action="/vocabulary">
+    {{ form.hidden_tag() }}
+    <td>
+      <div class="form-group">
+        {% if form.english.errors %}
+          {% for error in form.english.errors %}
+            <p class="error-message">{{ error }}</p>
+          {% endfor %}
+        {% endif %}
 
-        <table>
-        {% for word in vocabulary %}
-          <tr>
-          <td><a href="{{ url_for('viewSpecificCard', language='english',translation=word.english) }}">{{ word.english }}</a></td>
-          <td><a href="{{ url_for('viewSpecificCard', language='chinese',translation=word.chinese) }}">{{ word.chinese }}</a></td>
-          <td><a href="{{ url_for('viewSpecificCard', language='chinese',translation=word.chinese) }}">{{ word.pinyin }}</a></td>
-          </tr>
-        {% endfor %}
-        </table>
-
+        {{ form.english }}
       </div>
+    </td>
+    <td>
+      <div class="form-group">
+        {% if form.chinese.errors %}
+          {% for error in form.chinese.errors %}
+            <p class="error-message">{{ error }}</p>
+          {% endfor %}
+        {% endif %}
 
-      <div class="clearfix"></div>
-
-    </div>
-  </main>
+        {{ form.chinese }}
+      </div>
+    </td>
+    <td>
+      {{ form.submit(class="btn-primary") }}
+    </td>
+    </form>
+  </tr>
+</table>
+</div>
 {% endblock %}
