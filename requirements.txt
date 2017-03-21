@@ -1,5 +1,11 @@
 Flask==0.12
+Flask-SQLAlchemy==2.2
+Flask-WTF==0.14.2
 gunicorn==19.7.1
 Jinja2==2.9.5
 MarkupSafe==0.23
 Werkzeug==0.11.15
+itsdangerous==0.24
+pinyin==0.4.0
+psycopg2==2.7.1
+
