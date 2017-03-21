@@ -5,12 +5,15 @@ from forms import SignupForm, LoginForm, CardForm
 from random import seed,randrange,shuffle
 from time import clock
 from pinyin import pinyin
+import os
 
 app = Flask(__name__)
 
-app.secret_key = "flashr-development-key"
+# app.secret_key = "flashr-development-key"
+app.secret_key = os.getenv('FLASK_SECRET_KEY')
 
-app.config["SQLALCHEMY_DATABASE_URI"] = 'postgres://kreqqfwdzplzkx:302f7457a624a30f4816e0623fb848b60aa210d06c209043a3646aa5ee562f7b@ec2-54-235-240-92.compute-1.amazonaws.com:5432/d1j8v05aiq3o40'
+# app.config["SQLALCHEMY_DATABASE_URI"] = 'postgres://kreqqfwdzplzkx:302f7457a624a30f4816e0623fb848b60aa210d06c209043a3646aa5ee562f7b@ec2-54-235-240-92.compute-1.amazonaws.com:5432/d1j8v05aiq3o40'
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv('DATABASE_URL')
 db.init_app(app)
 
 seed(clock)
