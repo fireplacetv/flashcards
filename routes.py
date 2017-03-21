@@ -79,17 +79,15 @@ def viewSpecificCard(language, translation):
 
 	if language == 'english':
 		word = Word.query.filter_by(english=translation).first()
-		return render_template("view.html", word=word)
 	elif language == 'chinese':
 		word = Word.query.filter_by(chinese=translation).first()
-		return render_template("view.html", word=word)
 	elif language == 'wid':
-		print 'looking for word ', translation
 		word = Word.query.filter_by(wid=int(translation)).first()
-		print 'found word ', word.english, word.chinese, word.pinyin
-		return render_template("view.html", word=word)
 	else:
 		return "couldn't find word"
+
+	session['position'] = session['widlist'].index(word.wid)
+	return render_template("view.html", word=word)
 
 #########################
 # Vocabulary management #
