@@ -21,9 +21,8 @@ seed(clock)
 
 @app.route("/")
 def root():
-	return "hello world"
-	# session.clear()
-	# return redirect(url_for('viewCard'))
+	session.clear()
+	return redirect(url_for('viewCard'))
 
 @app.route("/view/")
 @app.route("/view")
