@@ -120,6 +120,10 @@ def viewSpecificCard(language, translation):
 	else:
 		return "couldn't find word"
 
+@app.route("/index")
+def viewAll():
+	vocabulary = Word.query.all();
+	return render_template("vocabulary.html", vocabulary=vocabulary)
 
 if __name__ == "__main__":
 	app.run(debug=True, host='0.0.0.0')

@@ -40,13 +40,14 @@
 
   $(document).ready(function() {
 
+    setLanguage(language);
+    displayCard();
+
     {% if session['pinyin'] %}
       setPinyin(true);
     {% else %}
       setPinyin(false);
     {% endif %}
-    setLanguage(language);
-    displayCard();
 
     if (language=='english') {
       $('.translation-english').css('display','block');

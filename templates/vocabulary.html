@@ -10,9 +10,9 @@
         <table>
         {% for word in vocabulary %}
           <tr>
-          <td><a href="{{ url_for('viewCard', language='english',translation=word.english) }}">{{ word.english }}</a></td>
-          <td><a href="{{ url_for('viewCard', language='chinese',translation=word.chinese) }}">{{ word.chinese }}</a></td>
-          <td><a href="{{ url_for('viewCard', language='chinese',translation=word.chinese) }}">{{ word.pinyin }}</a></td>
+          <td><a href="{{ url_for('viewSpecificCard', language='english',translation=word.english) }}">{{ word.english }}</a></td>
+          <td><a href="{{ url_for('viewSpecificCard', language='chinese',translation=word.chinese) }}">{{ word.chinese }}</a></td>
+          <td><a href="{{ url_for('viewSpecificCard', language='chinese',translation=word.chinese) }}">{{ word.pinyin }}</a></td>
           </tr>
         {% endfor %}
         </table>
