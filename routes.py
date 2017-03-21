@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 app.secret_key = "flashr-development-key"
 
-app.config["SQLALCHEMY_DATABASE_URI"] = 'postgresql://localhost/flashr'
+app.config["SQLALCHEMY_DATABASE_URI"] = 'postgres://kreqqfwdzplzkx:302f7457a624a30f4816e0623fb848b60aa210d06c209043a3646aa5ee562f7b@ec2-54-235-240-92.compute-1.amazonaws.com:5432/d1j8v05aiq3o40'
 db.init_app(app)
 
 seed(clock)
