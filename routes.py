@@ -21,7 +21,6 @@ seed(clock)
 
 @app.route("/")
 def root():
-	return "deployed from github"
 	session.clear()
 	return redirect(url_for('viewCard'))
 
