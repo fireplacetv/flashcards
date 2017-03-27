@@ -20,6 +20,15 @@ seed(clock)
 # Flash cards #
 ###############
 
+def setWidList():
+	widlist = [w.wid for w in Word.query.all()]
+	shuffle(widlist)
+	session['widlist']=widlist
+
+	session['position']=0
+	session['pinyin'] = False
+	session['language'] = 'chinese'
+
 @app.route("/")
 def root():
 	session.clear()
@@ -32,15 +41,8 @@ def viewCard():
 		wid = session['widlist'][session['position']]
 		word = Word.query.filter_by(wid=wid).first()
 	else:
-		widlist = [w.wid for w in Word.query.all()]
-		shuffle(widlist)
-		session['widlist']=widlist
-
-		session['position']=0
-		session['pinyin'] = False
-		session['language'] = 'chinese'
-
-		word = Word.query.filter_by(wid=widlist[0]).first()
+		setWidList()
+		word = Word.query.filter_by(wid=session['widlist'][0]).first()
 
 	return render_template("view.html",word=word)
 
@@ -56,11 +58,6 @@ def nextCard():
 	session['position']=(session['position'] + 1) % len(session['widlist'])
 	return redirect(url_for('viewCard'))
 
-@app.route("/pinyin")
-def togglePinyin():
-	session['pinyin'] = not session['pinyin']
-	return redirect(url_for('viewCard'))
-
 @app.route("/english")
 def toggleEnglish():
 	session['language'] = 'english'
@@ -70,6 +67,11 @@ def toggleEnglish():
 def toggleChinese():
 	session['language'] = 'chinese'
 	return 	redirect(url_for('viewCard'))
+
+@app.route("/pinyin")
+def togglePinyin():
+	session['language'] = 'pinyin'
+	return redirect(url_for('viewCard'))
 
 @app.route("/view/<language>/<translation>")
 def viewSpecificCard(language, translation):
@@ -86,7 +88,10 @@ def viewSpecificCard(language, translation):
 	else:
 		return "couldn't find word"
 
+	if 'widlist' not in session or 'position' not in session:
+		setWidList()
 	session['position'] = session['widlist'].index(word.wid)
+
 	return render_template("view.html", word=word)
 
 #########################

@@ -6,9 +6,15 @@
     if (language=='english') {
       $('.translation-english').css('display','block');
       $('.translation-chinese').css('display','none');
+      $('.translation-pinyin').css('display','none');
     } else if (language=='chinese') {
       $('.translation-english').css('display','none');
       $('.translation-chinese').css('display','block');
+      $('.translation-pinyin').css('display','none');
+    } else if (language == 'pinyin') {
+      $('.translation-english').css('display','none');
+      $('.translation-chinese').css('display','none');
+      $('.translation-pinyin').css('display','block');
     }
   };
 
@@ -18,16 +24,8 @@
       $('#language-button').text(language);
     } else if (language=='chinese') {
       $('#language-button').text(language);
-    }
-  };
-
-  function setPinyin(pinyin) {
-    if (pinyin) {
-      $('.translation-pinyin').css('display', 'none');
-      $('#pinyin-button').text('show pinyin');
-    } else if (!pinyin) {
-      $('.translation-pinyin').css('display', 'block');
-      $('#pinyin-button').text('hide pinyin');
+    } else if (language == 'pinyin') {
+      $('#language-button').text(language);
     }
   };
 
@@ -35,6 +33,8 @@
   var displayLanguage = 'english';
   if (language == 'chinese') {
     displayLanguage = 'chinese';
+  } else if (language == 'pinyin') {
+    displayLanguage = 'pinyin';
   }
 
   $(document).ready(function() {
@@ -42,16 +42,12 @@
     setLanguage(language);
     displayCard();
 
-    {% if session['pinyin'] %}
-      setPinyin(true);
-    {% else %}
-      setPinyin(false);
-    {% endif %}
-
     if (language=='english') {
       $('.translation-english').css('display','block');
     } else if (language=='chinese') {
       $('.translation-chinese').css('display','block');
+    } else if (language=='pinyin') {
+      $('.translation-pinyin').css('display','block');
     }
 
     $('.flash-card-word').click(function() { 
@@ -59,34 +55,35 @@
         displayLanguage = 'chinese';
         $('.translation-english').css('display','none');
         $('.translation-chinese').css('display','block');
+        $('.translation-pinyin').css('display','none');
       } else if (displayLanguage =='chinese') {
+        displayLanguage = 'pinyin';
+        $('.translation-english').css('display','none');
+        $('.translation-chinese').css('display','none');
+        $('.translation-pinyin').css('display','block');
+      } else if (displayLanguage == 'pinyin') {
         displayLanguage = 'english';
         $('.translation-english').css('display','block');
         $('.translation-chinese').css('display','none');
+        $('.translation-pinyin').css('display','none');
       }
     });
 
-    $('#pinyin-button').click(function() {
-      window.location = "{{ url_for('togglePinyin') }}";
-    });
   });
 </script>
 
 {% endblock %}
 
-
 {% block title %}
-    <!-- pinyin button -->
-    <a href="{{ url_for('togglePinyin') }}">
-      <span class="title-bar-button" id="pinyin-button"></span>
-    </a>
     <!-- language toggle -->
     {% if session['language'] == 'chinese' %}
-    <a href="{{ url_for('toggleEnglish') }}">
-    {% else %}
-    <a href="{{ url_for('toggleChinese') }}">
+      <a href="{{ url_for('togglePinyin') }}">
+    {% elif session['language'] == 'pinyin' %}
+      <a href="{{ url_for('toggleEnglish') }}">
+    {% elif session['language'] == 'english' %}
+      <a href="{{ url_for('toggleChinese') }}">
     {% endif %}
-      <span class="title-bar-button" id="language-button"></span>
+    <span class="title-bar-button" id="language-button"></span>
     </a>
 {% endblock %}
 
@@ -106,7 +103,9 @@
       </span>
       <span class="translation-chinese">
         {{ word.chinese.replace(' ','') }}
-        <span class="translation-pinyin">({{ word.pinyin }})</span>
+      </span>
+      <span class="translation-pinyin">
+        ({{ word.pinyin }})
       </span>
     </div>
   </div>
