@@ -50,7 +50,7 @@
       $('.translation-pinyin').css('display','block');
     }
 
-    $('.flash-card-word').click(function() { 
+    $('.flash-card-word').click(function() {
       if (displayLanguage =='english') {
         displayLanguage = 'chinese';
         $('.translation-english').css('display','none');
@@ -66,9 +66,21 @@
         $('.translation-english').css('display','block');
         $('.translation-chinese').css('display','none');
         $('.translation-pinyin').css('display','none');
-      }
+      }      
     });
+  });
 
+  $(document).keyup(function(e) {
+    switch (e.which) {
+      case 37:
+        window.location.href = "{{ url_for('prevCard') }}";
+        break;
+      case 39:
+        window.location.href = "{{ url_for('nextCard') }}";
+        break;
+      default:
+        return;
+    }
   });
 </script>
 
@@ -85,6 +97,7 @@
     {% endif %}
     <span class="title-bar-button" id="language-button"></span>
     </a>
+
 {% endblock %}
 
 {% block content %}
