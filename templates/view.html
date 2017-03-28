@@ -18,6 +18,44 @@
     }
   };
 
+  function cycleCard(reverse=false) {
+    if (reverse) {
+  if (displayLanguage =='english') {
+        displayLanguage = 'pinyin';
+        $('.translation-english').css('display','none');
+        $('.translation-chinese').css('display','none');
+        $('.translation-pinyin').css('display','block');
+      } else if (displayLanguage =='pinyin') {
+        displayLanguage = 'chinese';
+        $('.translation-english').css('display','none');
+        $('.translation-chinese').css('display','block');
+        $('.translation-pinyin').css('display','none');
+      } else if (displayLanguage == 'chinese') {
+        displayLanguage = 'english';
+        $('.translation-english').css('display','block');
+        $('.translation-chinese').css('display','none');
+        $('.translation-pinyin').css('display','none');
+      }      
+    } else {
+      if (displayLanguage =='english') {
+        displayLanguage = 'chinese';
+        $('.translation-english').css('display','none');
+        $('.translation-chinese').css('display','block');
+        $('.translation-pinyin').css('display','none');
+      } else if (displayLanguage =='chinese') {
+        displayLanguage = 'pinyin';
+        $('.translation-english').css('display','none');
+        $('.translation-chinese').css('display','none');
+        $('.translation-pinyin').css('display','block');
+      } else if (displayLanguage == 'pinyin') {
+        displayLanguage = 'english';
+        $('.translation-english').css('display','block');
+        $('.translation-chinese').css('display','none');
+        $('.translation-pinyin').css('display','none');
+      }      
+    }
+  };
+
   function setLanguage(newLanguage) {
     language = newLanguage;
     if (language=='english') {
@@ -50,24 +88,7 @@
       $('.translation-pinyin').css('display','block');
     }
 
-    $('.flash-card-word').click(function() {
-      if (displayLanguage =='english') {
-        displayLanguage = 'chinese';
-        $('.translation-english').css('display','none');
-        $('.translation-chinese').css('display','block');
-        $('.translation-pinyin').css('display','none');
-      } else if (displayLanguage =='chinese') {
-        displayLanguage = 'pinyin';
-        $('.translation-english').css('display','none');
-        $('.translation-chinese').css('display','none');
-        $('.translation-pinyin').css('display','block');
-      } else if (displayLanguage == 'pinyin') {
-        displayLanguage = 'english';
-        $('.translation-english').css('display','block');
-        $('.translation-chinese').css('display','none');
-        $('.translation-pinyin').css('display','none');
-      }      
-    });
+    $('.flash-card-word').click(function() {cycleCard();});
   });
 
   $(document).keyup(function(e) {
@@ -77,6 +98,12 @@
         break;
       case 39:
         window.location.href = "{{ url_for('nextCard') }}";
+        break;
+      case 38:
+        cycleCard();
+        break;
+      case 40:
+        cycleCard(reverse=true);
         break;
       default:
         return;
@@ -97,7 +124,10 @@
     {% endif %}
     <span class="title-bar-button" id="language-button"></span>
     </a>
-
+    <!-- edit button -->
+    <a href="{{ url_for('editCard', wid=word.wid) }}">
+      <span class="title-bar-button" id="edit-button">edit</span>
+    </a>
 {% endblock %}
 
 {% block content %}
