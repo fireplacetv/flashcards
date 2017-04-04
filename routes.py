@@ -1,20 +1,29 @@
 from flask import Flask, render_template, request, session,\
  redirect, url_for, g
+from flask_restful import Resource, Api
 from models import db, Word
-from forms import SignupForm, LoginForm, CardForm
+from forms import SignupForm, LoginForm, AddCardForm, EditCardForm, DeleteCardForm
 from random import seed,randrange,shuffle
 from time import clock
 from pinyin import pinyin
 import os
+from words import ApiAllWords, ApiWord
 
 app = Flask(__name__)
-
 app.secret_key = os.getenv('FLASK_SECRET_KEY')
-
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv('DATABASE_URL')
-db.init_app(app)
 
+db.init_app(app)
 seed(clock)
+
+#######
+# API #
+#######
+api = Api(app)
+
+api.add_resource(ApiAllWords, '/api/words')
+api.add_resource(ApiWord, '/api/words/<int:wid>')
+
 
 ###############
 # Flash cards #
@@ -131,6 +140,11 @@ def editCard(wid):
 
 	elif request.method == 'GET':
 		return render_template("edit.html", word=word, form=form)
+
+@app.route("/delete/<int:wid>", methods=['GET','POST'])
+def deleteCard(wid):
+
+	return 'done'
 
 @app.route("/vocabulary", methods=["GET","POST"])
 def viewAll():
