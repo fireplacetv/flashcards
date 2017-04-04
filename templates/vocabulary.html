@@ -3,6 +3,11 @@
 {% block content %}
 <div class="vocabulary-list">
 <table class="vocabulary-table">
+  <thead>
+  <th>English</th>
+  <th>Chinese</th>
+  <th>Pinyin</th>
+  </thead>
 {% for word in vocabulary %}
   <tr>
   <td><a href="{{ url_for('viewSpecificCard', language='english',translation=word.english) }}">{{ word.english }}</a></td>

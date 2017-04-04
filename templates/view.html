@@ -3,107 +3,112 @@
 {% block scripts %}
 <script type="text/javascript">
   function displayCard() {
-    if (language=='english') {
-      $('.translation-english').css('display','block');
-      $('.translation-chinese').css('display','none');
-      $('.translation-pinyin').css('display','none');
-    } else if (language=='chinese') {
-      $('.translation-english').css('display','none');
-      $('.translation-chinese').css('display','block');
-      $('.translation-pinyin').css('display','none');
-    } else if (language == 'pinyin') {
-      $('.translation-english').css('display','none');
-      $('.translation-chinese').css('display','none');
-      $('.translation-pinyin').css('display','block');
-    }
+    $.get("/api/words/" + widlist[listpos], 
+      function(word) {
+        switch (displayLanguage) {
+          case 'chinese':
+            $('#display-word').html(word.chinese);
+            break;          
+          case 'pinyin':
+            $('#display-word').html('(' + word.pinyin + ')');
+            break;          
+          case 'english':
+            $('#display-word').html(word.english);
+            break;          
+          default:
+            $('#display-word').html('wtf');
+        }
+      });
   };
 
-  function cycleCard(reverse=false) {
+  function flipCard(reverse=false) {
     if (reverse) {
-  if (displayLanguage =='english') {
-        displayLanguage = 'pinyin';
-        $('.translation-english').css('display','none');
-        $('.translation-chinese').css('display','none');
-        $('.translation-pinyin').css('display','block');
-      } else if (displayLanguage =='pinyin') {
-        displayLanguage = 'chinese';
-        $('.translation-english').css('display','none');
-        $('.translation-chinese').css('display','block');
-        $('.translation-pinyin').css('display','none');
-      } else if (displayLanguage == 'chinese') {
-        displayLanguage = 'english';
-        $('.translation-english').css('display','block');
-        $('.translation-chinese').css('display','none');
-        $('.translation-pinyin').css('display','none');
-      }      
+        switch (displayLanguage) {
+          case 'chinese':
+            displayLanguage = 'english';
+            break;          
+          case 'pinyin':
+            displayLanguage = 'chinese';
+            break;          
+          case 'english':
+            displayLanguage = 'pinyin';
+            break;          
+        }
     } else {
-      if (displayLanguage =='english') {
-        displayLanguage = 'chinese';
-        $('.translation-english').css('display','none');
-        $('.translation-chinese').css('display','block');
-        $('.translation-pinyin').css('display','none');
-      } else if (displayLanguage =='chinese') {
-        displayLanguage = 'pinyin';
-        $('.translation-english').css('display','none');
-        $('.translation-chinese').css('display','none');
-        $('.translation-pinyin').css('display','block');
-      } else if (displayLanguage == 'pinyin') {
-        displayLanguage = 'english';
-        $('.translation-english').css('display','block');
-        $('.translation-chinese').css('display','none');
-        $('.translation-pinyin').css('display','none');
-      }      
+        switch (displayLanguage) {
+          case 'chinese':
+            displayLanguage = 'pinyin';
+            break;          
+          case 'pinyin':
+            displayLanguage = 'english';
+            break;          
+          case 'english':
+            displayLanguage = 'chinese';
+            break;          
+        }
     }
+    displayCard();
   };
 
-  function setLanguage(newLanguage) {
-    language = newLanguage;
-    if (language=='english') {
-      $('#language-button').text(language);
-    } else if (language=='chinese') {
-      $('#language-button').text(language);
-    } else if (language == 'pinyin') {
-      $('#language-button').text(language);
+  function changeCard(next=true) {
+    if (next) {
+      listpos = (listpos + 1) % widlist.length;
+    } else {
+      listpos = (listpos + widlist.length - 1) % widlist.length;
     }
-  };
-
-  var language = "{{ session['language'] }}";
-  var displayLanguage = 'english';
-  if (language == 'chinese') {
-    displayLanguage = 'chinese';
-  } else if (language == 'pinyin') {
-    displayLanguage = 'pinyin';
+    displayLanguage = defaultLanguage;
+    displayCard();
   }
 
-  $(document).ready(function() {
-
-    setLanguage(language);
-    displayCard();
-
-    if (language=='english') {
-      $('.translation-english').css('display','block');
-    } else if (language=='chinese') {
-      $('.translation-chinese').css('display','block');
-    } else if (language=='pinyin') {
-      $('.translation-pinyin').css('display','block');
+  function changeLanguage(newLanguage='') {
+    if (newLanguage == '') {
+      switch (defaultLanguage) {
+        case 'chinese':
+          defaultLanguage = 'pinyin';
+          break;
+        case 'pinyin':
+          defaultLanguage = 'english';
+          break;
+        case 'english':
+          defaultLanguage = 'chinese';
+          break;
+      }
+    } else {
+      defaultLanguage = newLanguage;
     }
+    $('#language-button').html(defaultLanguage);
+    displayLanguage = defaultLanguage;
+    displayCard();
+  }
 
-    $('.flash-card-word').click(function() {cycleCard();});
+  var widlist = {{ widlist }};
+  var listpos = 0;
+  var displayLanguage = 'chinese';
+  var defaultLanguage = 'chinese';
+  
+  $(document).ready(function() {
+    displayCard();
+    changeLanguage(newLanguage = defaultLanguage);
+
+    $('.flash-card-word').click(function() {flipCard();});
+    $('#prev-word').click(function() { changeCard(next=false); });
+    $('#next-word').click(function() { changeCard(); });
+    $('#language-button').click(function() { changeLanguage(); });
   });
 
   $(document).keyup(function(e) {
     switch (e.which) {
-      case 37:
-        window.location.href = "{{ url_for('prevCard') }}";
+      case 37: // left
+        changeCard(next=false);
         break;
-      case 39:
-        window.location.href = "{{ url_for('nextCard') }}";
+      case 39: // right
+        changeCard(next=true);
         break;
-      case 38:
-        cycleCard();
+      case 38: // up
+        flipCard(reverse=true);
         break;
-      case 40:
-        cycleCard(reverse=true);
+      case 40: // down
+        flipCard();
         break;
       default:
         return;
@@ -114,37 +119,15 @@
 {% endblock %}
 
 {% block title %}
-    <!-- language toggle -->
-    {% if session['language'] == 'chinese' %}
-      <a href="{{ url_for('togglePinyin') }}">
-    {% elif session['language'] == 'pinyin' %}
-      <a href="{{ url_for('toggleEnglish') }}">
-    {% elif session['language'] == 'english' %}
-      <a href="{{ url_for('toggleChinese') }}">
-    {% endif %}
-    <span class="title-bar-button" id="language-button"></span>
-    </a>
+    <span id="language-button" class="title-bar-button" id="language-button"></span>
 {% endblock %}
 
 {% block content %}
   <div class="flash-card">
-    <a href="{{ url_for('prevCard') }}"> 
-      <span class="navigation-button-prev">
-      </span>
-    </a>
-    <a href="{{ url_for('nextCard') }}">
-      <span class="navigation-button-next">
-      </span>
-    </a>
+    <span id="prev-word" class="navigation-button-prev"></span>
+    <span id="next-word" class="navigation-button-next"></span>
     <div class="flash-card-word">
-      <span class="translation-english">
-        {{ word.english.upper() }}
-      </span>
-      <span class="translation-chinese">
-        {{ word.chinese.replace(' ','') }}
-      </span>
-      <span class="translation-pinyin">
-        ({{ word.pinyin }})
+      <span id="display-word" class="translation">
       </span>
     </div>
   </div>

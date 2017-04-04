@@ -7,7 +7,7 @@ from random import seed,randrange,shuffle
 from time import clock
 from pinyin import pinyin
 import os
-from words import ApiAllWords, ApiWord
+from resources import ApiAllWords, ApiWord
 
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY')
@@ -22,7 +22,7 @@ seed(clock)
 api = Api(app)
 
 api.add_resource(ApiAllWords, '/api/words')
-api.add_resource(ApiWord, '/api/words/<int:wid>')
+api.add_resource(ApiWord, '/api/words/<int:wid>', endpoint='api.words')
 
 
 ###############
@@ -43,65 +43,11 @@ def root():
 	session.clear()
 	return redirect(url_for('viewCard'))
 
-@app.route("/view/")
-@app.route("/view")
+@app.route("/view2")
 def viewCard():
-	if 'widlist' in session and 'position' in session:
-		wid = session['widlist'][session['position']]
-		word = Word.query.filter_by(wid=wid).first()
-	else:
-		setWidList()
-		word = Word.query.filter_by(wid=session['widlist'][0]).first()
-
-	return render_template("view.html",word=word)
-
-@app.route("/view/prev")
-def prevCard():
-	print session['position']
-	session['position']=(session['position'] - 1) % len(session['widlist'])
-	print session['position']
-	return redirect(url_for('viewCard'))
-
-@app.route("/view/next")
-def nextCard():
-	session['position']=(session['position'] + 1) % len(session['widlist'])
-	return redirect(url_for('viewCard'))
-
-@app.route("/english")
-def toggleEnglish():
-	session['language'] = 'english'
-	return redirect(url_for('viewCard'))
-
-@app.route("/chinese")
-def toggleChinese():
-	session['language'] = 'chinese'
-	return 	redirect(url_for('viewCard'))
-
-@app.route("/pinyin")
-def togglePinyin():
-	session['language'] = 'pinyin'
-	return redirect(url_for('viewCard'))
-
-@app.route("/view/<language>/<translation>")
-def viewSpecificCard(language, translation):
-	language = language.lower()
-	session['language'] = language.lower()
-	translation = translation.lower()
-
-	if language == 'english':
-		word = Word.query.filter_by(english=translation).first()
-	elif language == 'chinese':
-		word = Word.query.filter_by(chinese=translation).first()
-	elif language == 'wid':
-		word = Word.query.filter_by(wid=int(translation)).first()
-	else:
-		return "couldn't find word"
-
-	if 'widlist' not in session or 'position' not in session:
-		setWidList()
-	session['position'] = session['widlist'].index(word.wid)
-
-	return render_template("view.html", word=word)
+	widlist = [w.wid for w in Word.query.all()]
+	shuffle(widlist)
+	return render_template('view2.html', widlist=widlist)
 
 #########################
 # Vocabulary management #
@@ -149,7 +95,7 @@ def deleteCard(wid):
 @app.route("/vocabulary", methods=["GET","POST"])
 def viewAll():
 	vocabulary = Word.query.all();
-	form = CardForm()
+	form = AddCardForm()
 
 	if request.method == 'POST':
 		if not form.validate():

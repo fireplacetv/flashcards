@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import IntegerField, StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email, Length
 
 class SignupForm(FlaskForm):
@@ -14,7 +14,21 @@ class LoginForm(FlaskForm):
 	password = PasswordField('Password', validators=[DataRequired("Please enter a password.")])
 	submit = SubmitField('Sign in')
 
-class CardForm(FlaskForm):
+class AddCardForm(FlaskForm):
 	english = StringField('English', validators=[DataRequired("Please enter the english translation.")])
 	chinese = StringField('Chinese', validators=[DataRequired("Please enter the chinese translation.")])
-	submit=SubmitField("Add")
+	submit = SubmitField("Add")
+
+class EditCardForm(FlaskForm):
+	wid = IntegerField('Word ID', validators=[DataRequired("Please enter the word id")])
+	oldEnglish = StringField('English', validators=[DataRequired("Please confirm the existing English translation.")])
+	oldChinese = StringField('Chinese', validators=[DataRequired("Please confirm the existing Chinese translation.")])
+	newEnglish = StringField('English', validators=[DataRequired("Please enter the new English translation.")])
+	newChinese = StringField('Chinese', validators=[DataRequired("Please enter the new Chinese translation.")])
+	submit = SubmitField("Save")
+
+class DeleteCardForm(FlaskForm):
+	wid = IntegerField('Word ID', validators=[DataRequired("Please enter the word id")])
+	english = StringField('English', validators=[DataRequired("Please confirm the english translation.")])
+	chinese = StringField('Chinese', validators=[DataRequired("Please confirm the chinese translation.")])
+	confirm = SubmitField("Delete")
