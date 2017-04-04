@@ -43,11 +43,11 @@ def root():
 	session.clear()
 	return redirect(url_for('viewCard'))
 
-@app.route("/view2")
+@app.route("/view")
 def viewCard():
 	widlist = [w.wid for w in Word.query.all()]
 	shuffle(widlist)
-	return render_template('view2.html', widlist=widlist)
+	return render_template('view.html', widlist=widlist)
 
 #########################
 # Vocabulary management #
