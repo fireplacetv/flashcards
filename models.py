@@ -1,5 +1,6 @@
 from flask.ext.sqlalchemy import SQLAlchemy
 from pinyin import pinyin
+from json import dumps
 
 db = SQLAlchemy()
 
@@ -28,4 +29,3 @@ class Word(db.Model):
 			'chinese': self.chinese,
 			'pinyin': self.pinyin
 		}
-		

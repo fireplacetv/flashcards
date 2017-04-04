@@ -87,11 +87,6 @@ def editCard(wid):
 	elif request.method == 'GET':
 		return render_template("edit.html", word=word, form=form)
 
-@app.route("/delete/<int:wid>", methods=['GET','POST'])
-def deleteCard(wid):
-
-	return 'done'
-
 @app.route("/vocabulary", methods=["GET","POST"])
 def viewAll():
 	vocabulary = Word.query.all();

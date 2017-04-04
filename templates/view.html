@@ -19,6 +19,8 @@
             $('#display-word').html('wtf');
         }
       });
+    $('#progress').html((listpos+1) + '/' + widlist.length);
+    $('#wid').html('(wid:' + widlist[listpos] + ')');
   };
 
   function flipCard(reverse=false) {
@@ -115,11 +117,10 @@
     }
   });
 </script>
-
 {% endblock %}
 
 {% block title %}
-    <span id="language-button" class="title-bar-button" id="language-button"></span>
+    <span id="language-button" class="title-bar-button"></span>
 {% endblock %}
 
 {% block content %}
@@ -127,8 +128,11 @@
     <span id="prev-word" class="navigation-button-prev"></span>
     <span id="next-word" class="navigation-button-next"></span>
     <div class="flash-card-word">
-      <span id="display-word" class="translation">
-      </span>
+      <span id="display-word" class="translation"></span>
+    </div>
+    <div class="stats">
+      <span id="progress"></span>
+      <span id="wid"></span>
     </div>
   </div>
 {% endblock %}
