@@ -84,6 +84,17 @@
     displayCard();
   }
 
+  function shuffleDeck() {
+    var j, tmp, i;
+    for (i = widlist.length; i > 0; i--) {
+        j = Math.floor(Math.random() * i);
+        tmp = widlist[i - 1];
+        widlist[i - 1] = widlist[j];
+        widlist[j] = tmp;
+    }
+    displayCard();
+  }
+
   var widlist = {{ widlist }};
   var listpos = 0;
   var displayLanguage = 'chinese';
@@ -93,10 +104,11 @@
     displayCard();
     changeLanguage(newLanguage = defaultLanguage);
 
-    $('.flash-card-word').click(function() {flipCard();});
+    $('.flash-card-word').click(function() { flipCard(); });
     $('#prev-word').click(function() { changeCard(next=false); });
     $('#next-word').click(function() { changeCard(next=true); });
     $('#language-button').click(function() { changeLanguage(''); });
+    $('#shuffle-button').click(function() { shuffleDeck(); })
   });
 
   $(document).keyup(function(e) {
@@ -122,10 +134,11 @@
 
 {% block title %}
     <span id="language-button" class="title-bar-button"></span>
+    <span id="shuffle-button" class="title-bar-button"><s></s>shuffle</span>
 {% endblock %}
 
 {% block content %}
-  <div class="flash-card">
+  <div id="flash-card" class="flash-card">
     <span id="prev-word" class="navigation-button-prev"></span>
     <span id="next-word" class="navigation-button-next"></span>
     <div class="flash-card-word">

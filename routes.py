@@ -46,7 +46,6 @@ def root():
 @app.route("/view")
 def viewCard():
 	widlist = [w.wid for w in Word.query.all()]
-	shuffle(widlist)
 	return render_template('view.html', widlist=widlist)
 
 #########################
