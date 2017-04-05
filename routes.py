@@ -7,11 +7,12 @@ from random import seed,randrange,shuffle
 from time import clock
 from pinyin import pinyin
 import os
-from resources import ApiAllWords, ApiWord
+from resources import ApiAllWords, ApiWord, ApiWordSearch
 
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY')
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv('DATABASE_URL')
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = "False"
 
 db.init_app(app)
 seed(clock)
@@ -21,9 +22,8 @@ seed(clock)
 #######
 api = Api(app)
 
-api.add_resource(ApiAllWords, '/api/words')
-api.add_resource(ApiWord, '/api/words/<int:wid>', endpoint='api.words')
-
+api.add_resource(ApiAllWords, '/api/words', endpoint='api.allwords')
+api.add_resource(ApiWord, '/api/words/<key>', endpoint='api.words')
 
 ###############
 # Flash cards #
@@ -55,7 +55,7 @@ def viewCard():
 
 @app.route("/add", methods=["GET","POST"])
 def addCard():
-	form = CardForm()
+	form = AddCardForm()
 
 	if request.method == 'POST':
 		if not form.validate():
@@ -89,7 +89,7 @@ def editCard(wid):
 
 @app.route("/vocabulary", methods=["GET","POST"])
 def viewAll():
-	vocabulary = Word.query.all();
+	vocabulary = Word.query.order_by('pinyin')
 	form = AddCardForm()
 
 	if request.method == 'POST':
