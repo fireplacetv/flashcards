@@ -87,6 +87,16 @@
     updateDisplay();
   }
 
+  function loadDeck() {
+    $.get("/api/words", 
+      function(words) {
+        deck = words;
+        changeLanguage(newLanguage = defaultLanguage);
+        updateDisplay();
+      }
+    );
+  }
+
   function shuffleDeck() {
     var j, tmp, i;
     for (i = deck.length; i > 0; i--) {
@@ -108,18 +118,13 @@
   }
 
   $(document).ready(function() {
-    $.get("/api/words", 
-      function(words) {
-        deck = words;
-        changeLanguage(newLanguage = defaultLanguage);
-        updateDisplay();
-      }
-    );
+    loadDeck();
 
     $('.flash-card-word').click(function() { flipCard(); });
     $('#prev-word').click(function() { changeCard(next=false); });
     $('#next-word').click(function() { changeCard(next=true); });
     $('#language-button').click(function() { changeLanguage(''); });
+    $('#reload-button').click(function() { loadDeck(); });
     $('#shuffle-button').click(function() { shuffleDeck(); });
     $('#remove-card-button').click(function() { popCard(); });
   });
@@ -138,6 +143,15 @@
       case 40: // down
         flipCard(reverse=false);
         break;
+      case 83: // s
+        shuffleDeck();
+        break;
+      case 76: // l
+        loadDeck();
+        break;
+      case 88: // x
+        // popCard(); actually let's not use a hot key for that one
+        break;
       default:
         return;
     }
@@ -148,6 +162,7 @@
 {% block title %}
     <span id="language-button" class="button title-bar-button"></span>
     <span id="shuffle-button" class="button title-bar-button"><s></s>shuffle</span>
+    <span id="reload-button" class="button title-bar-button"><s></s>reload</span>
 {% endblock %}
 
 {% block content %}
@@ -162,7 +177,7 @@
         <span id="progress"></span>
         <span id="wid"></span>
       </div>
-      <span id="remove-card-button" class="button card-button">remove</span>
+      <span id="remove-card-button" class="button card-button">remove card</span>
     </div>
   </div>
 {% endblock %}
