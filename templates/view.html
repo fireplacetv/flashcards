@@ -23,7 +23,7 @@
         $('#display-word').html('wtf');
     }
     
-    $('#progress').html((deckPos+1) + '/' + deck.length);
+    $('#progress').html('card ' + (deckPos+1) + ' of ' + deck.length);
     $('#wid').html('(wid:' + deck[deckPos].wid + ')');
   };
 
@@ -95,7 +95,16 @@
         deck[i - 1] = deck[j];
         deck[j] = tmp;
     }
+    deckPos = 0;
     updateDisplay();
+  }
+
+  function popCard() {
+    if (deck.length > 1) {
+      deck.splice(deckPos,1);
+      deckPos = deckPos % deck.length;
+      updateDisplay();
+    }
   }
 
   $(document).ready(function() {
@@ -111,7 +120,8 @@
     $('#prev-word').click(function() { changeCard(next=false); });
     $('#next-word').click(function() { changeCard(next=true); });
     $('#language-button').click(function() { changeLanguage(''); });
-    $('#shuffle-button').click(function() { shuffleDeck(); })
+    $('#shuffle-button').click(function() { shuffleDeck(); });
+    $('#remove-card-button').click(function() { popCard(); });
   });
 
   $(document).keyup(function(e) {
@@ -136,8 +146,8 @@
 {% endblock %}
 
 {% block title %}
-    <span id="language-button" class="title-bar-button"></span>
-    <span id="shuffle-button" class="title-bar-button"><s></s>shuffle</span>
+    <span id="language-button" class="button title-bar-button"></span>
+    <span id="shuffle-button" class="button title-bar-button"><s></s>shuffle</span>
 {% endblock %}
 
 {% block content %}
@@ -147,9 +157,12 @@
     <div class="flash-card-word">
       <span id="display-word" class="translation"></span>
     </div>
-    <div class="stats">
-      <span id="progress"></span>
-      <span id="wid"></span>
+    <div class="card-status-bar">
+      <div class="stats">
+        <span id="progress"></span>
+        <span id="wid"></span>
+      </div>
+      <span id="remove-card-button" class="button card-button">remove</span>
     </div>
   </div>
 {% endblock %}

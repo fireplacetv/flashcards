@@ -25,10 +25,14 @@ body {
   text-transform: uppercase;
 }
 
-.title-bar-button {
+.button {
   color: black;
   background-color: tan;
   margin: 0px 0.5em;
+  cursor: pointer;
+}
+
+.title-bar-button {
   position: relative;
   float: right;
 }
@@ -80,11 +84,23 @@ body {
   display: block;
 }
 
+.card-status-bar {
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  position: absolute;
+}
+
+.card-button {
+  position: relative;
+  float: right;
+}
+
 .stats {
-    bottom: 0;
-    right: 0;
-    position: absolute;
-    float: right;}
+  bottom: 0;
+  position: absolute;
+  float: left;
+}
 
 /* Vocabulary List */
 .vocabulary-list {
