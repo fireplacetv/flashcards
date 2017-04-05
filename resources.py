@@ -13,9 +13,14 @@ class ApiAllWords(Resource):
 	def post(self):
 		args = parser.parse_args()
 		word = Word(args['english'].lower(), args['chinese'].lower())
-		db.session.add(word)
-		db.session.commit()
-		return word, 201
+		duplicate = Word.query.filter_by(english=args['english'].lower()).filter_by(chinese=args['chinese'])
+		if duplicate.count() > 0:
+			d = duplicate.first()
+			return {'result': 'duplicate word', 'word': {'wid': d.wid, 'english': d.english, 'chinese': d.chinese, 'pinyin': d.pinyin}}, 400
+		else: 
+			db.session.add(word)
+			db.session.commit()
+			return word, 201
 
 class ApiWord(Resource):
 	def get(self, key):
@@ -39,7 +44,6 @@ class ApiWord(Resource):
 			word.setEnglish(args['english'])
 		if 'chinese' in args.keys() and args['chinese'] != None:
 			word.setChinese(args['chinese'])
-		# db.session.add(word)
 		db.session.commit()
 		return {'wid': word.wid, 'english': word.english, 'chinese': word.chinese, 'pinyin': word.pinyin}, 200
 
@@ -52,3 +56,11 @@ class ApiWord(Resource):
 		db.session.delete(word)
 		db.session.commit()
 		return {'result': 'success', 'deletedword': wordJSON}, 200
+
+class ApiDeck(Resource):
+	def get(self):
+		return 200
+
+	def post(self):
+		return 200
+
