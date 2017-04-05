@@ -35,14 +35,13 @@ class ApiWord(Resource):
 		if word == None:
 			return {'result': 'no match found'}, 404
 		args = parser.parse_args()
-		data = word.data
-		if 'english' in args.keys():
-			data.english = args['english']
-		if 'chinese' in args.keys():
-			data.chinese = args['chinese']
-		word.data = data
-		db.session.add(word)
+		if 'english' in args.keys() and args['english'] != None:
+			word.setEnglish(args['english'])
+		if 'chinese' in args.keys() and args['chinese'] != None:
+			word.setChinese(args['chinese'])
+		# db.session.add(word)
 		db.session.commit()
+		return {'wid': word.wid, 'english': word.english, 'chinese': word.chinese, 'pinyin': word.pinyin}, 200
 
 
 	def delete(self, key):

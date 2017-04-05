@@ -7,7 +7,7 @@ from random import seed,randrange,shuffle
 from time import clock
 from pinyin import pinyin
 import os
-from resources import ApiAllWords, ApiWord, ApiWordSearch
+from resources import ApiAllWords, ApiWord
 
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY')

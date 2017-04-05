@@ -16,10 +16,10 @@ class Word(db.Model):
 		self.chinese = chinese
 		self.pinyin = pinyin.get(chinese)
 
-	def setEnglish(english):
+	def setEnglish(self, english):
 		self.english = english
 
-	def setChinese(chinese):
+	def setChinese(self, chinese):
 		self.chinese = chinese
 		self.pinyin = pinyin.get(chinese)
 
