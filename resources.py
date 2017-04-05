@@ -7,7 +7,7 @@ parser.add_argument('chinese')
 
 class ApiAllWords(Resource):
 	def get(self):
-		words = Word.query.order_by('pinyin')
+		words = Word.query.all()
 		return [{'wid': w.wid, 'english': w.english, 'chinese': w.chinese, 'pinyin': w.pinyin} for w in words]
 
 	def post(self):

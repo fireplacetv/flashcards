@@ -45,8 +45,7 @@ def root():
 
 @app.route("/view")
 def viewCard():
-	widlist = [w.wid for w in Word.query.all()]
-	return render_template('view.html', widlist=widlist)
+	return render_template('view.html')
 
 #########################
 # Vocabulary management #

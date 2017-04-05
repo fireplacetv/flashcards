@@ -2,26 +2,29 @@
 
 {% block scripts %}
 <script type="text/javascript">
-  function displayCard() {
-    $.get("/api/words/" + widlist[listpos], 
-      function(words) {
-        word = words[0];
-        switch (displayLanguage) {
-          case 'chinese':
-            $('#display-word').html(word.chinese);
-            break;          
-          case 'pinyin':
-            $('#display-word').html('(' + word.pinyin + ')');
-            break;          
-          case 'english':
-            $('#display-word').html(word.english);
-            break;          
-          default:
-            $('#display-word').html('wtf');
-        }
-      });
-    $('#progress').html((listpos+1) + '/' + widlist.length);
-    $('#wid').html('(wid:' + widlist[listpos] + ')');
+  var deckPos = 0;
+  var displayLanguage = 'chinese';
+  var defaultLanguage = 'chinese';
+  var deck;
+
+  function updateDisplay() {
+    var word = deck[deckPos];
+    switch (displayLanguage) {
+      case 'chinese':
+        $('#display-word').html(word.chinese);
+        break;          
+      case 'pinyin':
+        $('#display-word').html('(' + word.pinyin + ')');
+        break;          
+      case 'english':
+        $('#display-word').html(word.english);
+        break;          
+      default:
+        $('#display-word').html('wtf');
+    }
+    
+    $('#progress').html((deckPos+1) + '/' + deck.length);
+    $('#wid').html('(wid:' + deck[deckPos].wid + ')');
   };
 
   function flipCard(reverse) {
@@ -50,17 +53,17 @@
             break;          
         }
     }
-    displayCard();
+    updateDisplay();
   };
 
   function changeCard(next) {
     if (next) {
-      listpos = (listpos + 1) % widlist.length;
+      deckPos = (deckPos + 1) % deck.length;
     } else {
-      listpos = (listpos + widlist.length - 1) % widlist.length;
+      deckPos = (deckPos + deck.length - 1) % deck.length;
     }
     displayLanguage = defaultLanguage;
-    displayCard();
+    updateDisplay();
   }
 
   function changeLanguage(newLanguage) {
@@ -81,28 +84,28 @@
     }
     $('#language-button').html(defaultLanguage);
     displayLanguage = defaultLanguage;
-    displayCard();
+    updateDisplay();
   }
 
   function shuffleDeck() {
     var j, tmp, i;
-    for (i = widlist.length; i > 0; i--) {
+    for (i = deck.length; i > 0; i--) {
         j = Math.floor(Math.random() * i);
-        tmp = widlist[i - 1];
-        widlist[i - 1] = widlist[j];
-        widlist[j] = tmp;
+        tmp = deck[i - 1];
+        deck[i - 1] = deck[j];
+        deck[j] = tmp;
     }
-    displayCard();
+    updateDisplay();
   }
 
-  var widlist = {{ widlist }};
-  var listpos = 0;
-  var displayLanguage = 'chinese';
-  var defaultLanguage = 'chinese';
-  
   $(document).ready(function() {
-    displayCard();
-    changeLanguage(newLanguage = defaultLanguage);
+    $.get("/api/words", 
+      function(words) {
+        deck = words;
+        changeLanguage(newLanguage = defaultLanguage);
+        updateDisplay();
+      }
+    );
 
     $('.flash-card-word').click(function() { flipCard(); });
     $('#prev-word').click(function() { changeCard(next=false); });
