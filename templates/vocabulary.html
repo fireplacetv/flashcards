@@ -15,11 +15,12 @@
     <td><a href="">{{ word.english }}</a></td>
     <td><a href="">{{ word.chinese }}</a></td>
     <td><a href="">{{ word.pinyin }}</a></td>
-    <td><a href="">delete</a></td>
+    <!-- <td><a href="">delete</a></td> -->
   </tr>
 {% endfor %}
   <tr>
     <form method="POST" action="/vocabulary">
+    <td>
     {{ form.hidden_tag() }}
     <td>
       <div class="form-group">
