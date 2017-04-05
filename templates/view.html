@@ -4,7 +4,8 @@
 <script type="text/javascript">
   function displayCard() {
     $.get("/api/words/" + widlist[listpos], 
-      function(word) {
+      function(words) {
+        word = words[0];
         switch (displayLanguage) {
           case 'chinese':
             $('#display-word').html(word.chinese);
@@ -23,7 +24,7 @@
     $('#wid').html('(wid:' + widlist[listpos] + ')');
   };
 
-  function flipCard(reverse=false) {
+  function flipCard(reverse) {
     if (reverse) {
         switch (displayLanguage) {
           case 'chinese':
@@ -52,7 +53,7 @@
     displayCard();
   };
 
-  function changeCard(next=true) {
+  function changeCard(next) {
     if (next) {
       listpos = (listpos + 1) % widlist.length;
     } else {
@@ -62,7 +63,7 @@
     displayCard();
   }
 
-  function changeLanguage(newLanguage='') {
+  function changeLanguage(newLanguage) {
     if (newLanguage == '') {
       switch (defaultLanguage) {
         case 'chinese':
@@ -94,8 +95,8 @@
 
     $('.flash-card-word').click(function() {flipCard();});
     $('#prev-word').click(function() { changeCard(next=false); });
-    $('#next-word').click(function() { changeCard(); });
-    $('#language-button').click(function() { changeLanguage(); });
+    $('#next-word').click(function() { changeCard(next=true); });
+    $('#language-button').click(function() { changeLanguage(''); });
   });
 
   $(document).keyup(function(e) {
@@ -110,7 +111,7 @@
         flipCard(reverse=true);
         break;
       case 40: // down
-        flipCard();
+        flipCard(reverse=false);
         break;
       default:
         return;
