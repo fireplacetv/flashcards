@@ -25,6 +25,7 @@ class Word(db.Model):
 
 	def serialize(self):
 		return {
+			'wid': self.wid,
 			'english': self.english,
 			'chinese': self.chinese,
 			'pinyin': self.pinyin
@@ -50,18 +51,35 @@ class Deck(db.Model):
 	__tablename__ = "decks"
 	did = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.String(60))
-	owner = db.Column(db.Integer, db.ForeignKey('users.uid'))
+	uid = db.Column(db.Integer, db.ForeignKey('users.uid'))
 
-	def __init__(self, name, ownerId):
+	def __init__(self, ownerId, name):
 		self.name = name
-		self.owner = ownerId
+		self.uid = ownerId
 
-class DeckCards(db.Model):
-	__tablename__ = "deckcards"
-	dcid = db.Column(db.Integer, primary_key = True)
+	def serialize(self):
+		deckcards = DeckCard.query.filter_by(did=self.did)
+		cards = [Word.query.filter_by(wid=c.wid).first() for c in deckcards]
+		return {
+			'did': self.did,
+			'name': self.name,
+			'owner': self.uid,
+			'cards': [c.serialize() for c in cards]
+		}
+
+class DeckCard(db.Model):
+	__tablename__ = "deckwords"
+	dwid = db.Column(db.Integer, primary_key = True)
 	did = db.Column(db.Integer, db.ForeignKey('decks.did'))
 	wid = db.Column(db.Integer, db.ForeignKey('words.wid'))
 
 	def __init__(self, deckId, wordId):
 		self.did = deck
 		self.wid = word
+
+	def serialize(self):
+		return {
+			'dwid': self.dwid,
+			'did': self.did,
+			'wid': self.wid
+		}

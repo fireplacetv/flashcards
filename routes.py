@@ -7,7 +7,7 @@ from random import seed,randrange,shuffle
 from time import clock
 from pinyin import pinyin
 import os
-from resources import ApiAllWords, ApiWord
+from resources import ApiWords, ApiWord, ApiDecks, ApiDeck
 
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY')
@@ -22,8 +22,11 @@ seed(clock)
 #######
 api = Api(app)
 
-api.add_resource(ApiAllWords, '/api/words', endpoint='api.allwords')
-api.add_resource(ApiWord, '/api/words/<key>', endpoint='api.words')
+api.add_resource(ApiWords, '/api/words', endpoint='api.words')
+api.add_resource(ApiWord, '/api/words/<key>', endpoint='api.word')
+api.add_resource(ApiDecks, '/api/decks', endpoint='api.decks')
+api.add_resource(ApiDeck, '/api/decks/<key>', endpoint='api.deck')
+
 
 ###############
 # Flash cards #
@@ -43,9 +46,15 @@ def root():
 	session.clear()
 	return redirect(url_for('viewCard'))
 
-@app.route("/view")
+@app.route("/words")
 def viewCard():
-	return render_template('view.html')
+	form = EditCardForm()
+	return render_template('view.html', form=form)
+
+@app.route("/decks/<int:deckid>")
+def viewNewDeck(deckid):
+	form = EditCardForm()
+	return render_template('view.html', form=form, deckid=deckid)
 
 #########################
 # Vocabulary management #

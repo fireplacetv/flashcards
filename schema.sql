@@ -1,8 +1,6 @@
 DROP TABLE IF EXISTS users;
 CREATE TABLE users (
 	uid SERIAL PRIMARY KEY,
-	firstname VARCHAR(60) NOT NULL,
-	lastname VARCHAR(60) NOT NULL,
 	email VARCHAR(60) NOT NULL UNIQUE,
 	passwordhash VARCHAR(100) NOT NULL
 );
@@ -15,9 +13,16 @@ CREATE TABLE words (
 	pinyin VARCHAR(60)
 );
 
-DROP TABLE IF EXISTS userwords;
-CREATE TABLE userwords (
-	pid SERIAL PRIMARY KEY,
-	userid INTEGER REFERENCES users(uid),
-	wordid INTEGER REFERENCES words(wid)
+DROP TABLE IF EXISTS decks;
+CREATE TABLE decks (
+	did SERIAL PRIMARY KEY,
+	uid INTEGER REFERENCES users(uid),
+	name VARCHAR(60) NOT NULL
+);
+
+DROP TABLE IF EXISTS deckwords;
+CREATE TABLE deckwords (
+	dwid SERIAL PRIMARY KEY,
+	did INTEGER REFERENCES decks(did),
+	wid INTEGER REFERENCES words(wid)
 );

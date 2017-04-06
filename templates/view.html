@@ -7,8 +7,23 @@
   var defaultLanguage = 'chinese';
   var deck;
 
+  function loadDeck() {
+    {% if deckid %}
+    $.get("/api/decks/" + "{{ deckid }}", 
+    {% else %}
+    $.get("/api/words", 
+    {% endif %}
+      function(apiDeck) {
+        deck = apiDeck;
+        deckPos = 0;
+        changeLanguage(newLanguage = defaultLanguage);
+        updateDisplay();
+      }
+    );
+  }
+
   function updateDisplay() {
-    var word = deck[deckPos];
+    var word = deck.cards[deckPos];
     switch (displayLanguage) {
       case 'chinese':
         $('#display-word').html(word.chinese);
@@ -22,9 +37,11 @@
       default:
         $('#display-word').html('wtf');
     }
-    
-    $('#progress').html('card ' + (deckPos+1) + ' of ' + deck.length);
-    $('#wid').html('(wid:' + deck[deckPos].wid + ')');
+    $('#edit-english-field').val(deck.cards[deckPos].english);
+    $('#edit-chinese-field').val(deck.cards[deckPos].chinese);
+
+    $('#progress').html('card ' + (deckPos+1) + ' of ' + deck.cards.length);
+    $('#wid').html('(wid:' + deck.cards[deckPos].wid + ')');
   };
 
   function flipCard(reverse) {
@@ -58,9 +75,9 @@
 
   function changeCard(next) {
     if (next) {
-      deckPos = (deckPos + 1) % deck.length;
+      deckPos = (deckPos + 1) % deck.cards.length;
     } else {
-      deckPos = (deckPos + deck.length - 1) % deck.length;
+      deckPos = (deckPos + deck.cards.length - 1) % deck.cards.length;
     }
     displayLanguage = defaultLanguage;
     updateDisplay();
@@ -87,96 +104,119 @@
     updateDisplay();
   }
 
-  function loadDeck() {
-    $.get("/api/words", 
-      function(words) {
-        deck = words;
-        deckPos = 0;
-        changeLanguage(newLanguage = defaultLanguage);
-        updateDisplay();
-      }
-    );
-  }
 
   function shuffleDeck() {
     var j, tmp, i;
-    for (i = deck.length; i > 0; i--) {
+    for (i = deck.cards.length; i > 0; i--) {
         j = Math.floor(Math.random() * i);
-        tmp = deck[i - 1];
-        deck[i - 1] = deck[j];
-        deck[j] = tmp;
+        tmp = deck.cards[i - 1];
+        deck.cards[i - 1] = deck.cards[j];
+        deck.cards[j] = tmp;
     }
     deckPos = 0;
+    displayLanguage = defaultLanguage;
     updateDisplay();
   }
 
   function popCard() {
-    if (deck.length > 1) {
-      deck.splice(deckPos,1);
-      deckPos = deckPos % deck.length;
+    if (deck.cards.length > 1) {
+      deck.cards.splice(deckPos,1);
+      deckPos = deckPos % deck.cards.length;
+      displayLanguage = defaultLanguage;
       updateDisplay();
     }
+  }
+
+  function editCardClickHandler() {
+    if ($('#edit-card-area').css('display')=='none') {
+      $("#display-word").css("display","none");
+      $("#edit-card-area").css("display","block");
+    } else {
+      $("#display-word").css("display","block");
+      $("#edit-card-area").css("display","none");
+    }
+  }
+
+  function updateCardHandler() {
+    $.ajax({
+        url: '/api/words/' + deck.cards[deckPos].wid, 
+        method: 'PUT', 
+        data: {
+          'english': $('#edit-english-field').val().toLowerCase(),
+          'chinese': $('#edit-chinese-field').val()
+        },
+        success: function() {
+          $.get('/api/words/'+deck.cards[deckPos].wid, function(results) {
+            deck.cards[deckPos] = results[0];
+            $("#display-word").css("display","block");
+            $("#edit-card-area").css("display","none");
+            displayLanguage = defaultLanguage;
+            updateDisplay();
+          });
+        }
+    });    
   }
 
   $(document).ready(function() {
     loadDeck();
 
-    $('.flash-card-word').click(function() { flipCard(); });
+    $('.flash-card-word').click(flipCard);
     $('#prev-word').click(function() { changeCard(next=false); });
     $('#next-word').click(function() { changeCard(next=true); });
     $('#language-button').click(function() { changeLanguage(''); });
-    $('#reload-button').click(function() { loadDeck(); });
-    $('#shuffle-button').click(function() { shuffleDeck(); });
-    $('#remove-card-button').click(function() { popCard(); });
+    $('#reload-button').click(loadDeck);
+    $('#shuffle-button').click(shuffleDeck);
+    $('#remove-card-button').click(popCard);
+    $('#edit-card-button').click(editCardClickHandler);
+    $('#save-edits-button').click(updateCardHandler);
   });
 
   $(document).keyup(function(e) {
-    switch (e.which) {
-      case 37: // left
-        changeCard(next=false);
-        break;
-      case 39: // right
-        changeCard(next=true);
-        break;
-      case 38: // up
-        flipCard(reverse=true);
-        break;
-      case 40: // down
-        flipCard(reverse=false);
-        break;
-      case 82: // r
-        loadDeck();
-        break;
-      case 83: // s
-        shuffleDeck();
-        break;
-      case 76: // l
-        if (e.shiftKey) {
-          changeLanguage('');
+    if ($('#edit-card-area').css('display')=='none') {
+      if (e.ctrlKey) {
+        switch (e.which) {
+          case 82: // r
+            loadDeck();
+            break;
+          case 83: // s
+            shuffleDeck();
+            break;
+          case 76: // l
+            changeLanguage('');
+            break;
+          case 67: // c
+            changeLanguage('chinese');
+            break;
+          case 69: // e
+            changeLanguage('english');
+            break;
+          case 80: // p
+            changeLanguage('pinyin');
+            break;
+          case 88: // x
+            popCard(); 
+            break;
+          default:
+            break;
         }
-        break;
-      case 67: // c
-        if (e.shiftKey) {
-          changeLanguage('chinese');
+      } else {
+        switch (e.which) {
+          case 37: // left
+            changeCard(next=false);
+            break;
+          case 39: // right
+            changeCard(next=true);
+            break;
+          case 38: // up
+            flipCard(reverse=true);
+            break;
+          case 40: // down
+            flipCard(reverse=false);
+            break;
+          default:
+            return;
         }
-        break;
-      case 69: // e
-        if (e.shiftKey) {
-          changeLanguage('english');
-        }
-        break;
-      case 80: // p
-        if (e.shiftKey) {
-          changeLanguage('pinyin');
-        }
-        break;
-      case 88: // x
-        if (e.shiftKey) {
-          popCard(); 
-        }
-        break;
-      default:
-        return;
+      }
     }
   });
 </script>
@@ -185,7 +225,7 @@
 {% block title %}
     <span id="language-button" class="button title-bar-button"></span>
     <span id="shuffle-button" class="button title-bar-button"><s></s>shuffle</span>
-    <span id="reload-button" class="button title-bar-button"><s></s>reload</span>
+    <span id="reload-button" class="button title-bar-button"><s></s>reload deck</span>
 {% endblock %}
 
 {% block content %}
@@ -194,13 +234,19 @@
     <span id="next-word" class="navigation-button-next"></span>
     <div class="flash-card-word">
       <span id="display-word" class="translation"></span>
+      <div id="edit-card-area" class="flash-card-editor" style="display: none;">
+        <input id="edit-english-field" name="english" type="text" value="">
+        <input id="edit-chinese-field" name="chinese" type="text" value="">
+        <span id="save-edits-button" class="button">save</span>
+      </div>
     </div>
     <div class="card-status-bar">
       <div class="stats">
         <span id="progress"></span>
         <span id="wid"></span>
       </div>
-      <span id="remove-card-button" class="button card-button">remove card</span>
+      <span id="remove-card-button" class="button card-button">remove</span>
+      <span id="edit-card-button" class="button card-button">edit</span>
     </div>
   </div>
 {% endblock %}

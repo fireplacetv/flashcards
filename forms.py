@@ -20,11 +20,8 @@ class AddCardForm(FlaskForm):
 	submit = SubmitField("Add")
 
 class EditCardForm(FlaskForm):
-	wid = IntegerField('Word ID', validators=[DataRequired("Please enter the word id")])
-	oldEnglish = StringField('English', validators=[DataRequired("Please confirm the existing English translation.")])
-	oldChinese = StringField('Chinese', validators=[DataRequired("Please confirm the existing Chinese translation.")])
-	newEnglish = StringField('English', validators=[DataRequired("Please enter the new English translation.")])
-	newChinese = StringField('Chinese', validators=[DataRequired("Please enter the new Chinese translation.")])
+	english = StringField('English', validators=[DataRequired("Please enter the new English translation.")])
+	chinese = StringField('Chinese', validators=[DataRequired("Please enter the new Chinese translation.")])
 	submit = SubmitField("Save")
 
 class DeleteCardForm(FlaskForm):
