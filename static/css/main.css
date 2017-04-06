@@ -43,7 +43,7 @@ body {
   margin: 1% 3%;
   position: absolute;
   background-color: beige;
-  overflow: scroll;
+  overflow: auto;
 }
 
 /* flash card */
