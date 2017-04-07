@@ -87,7 +87,7 @@
   };
 
   function changeCard(next) {
-    if (next) {
+    if (next || next == undefined) {
       deckPos = (deckPos + 1) % deck.cards.length;
     } else {
       deckPos = (deckPos + deck.cards.length - 1) % deck.cards.length;
@@ -97,7 +97,7 @@
   }
 
   function changeLanguage(newLanguage) {
-    if (newLanguage == '') {
+    if (newLanguage == '' || newLanguage==undefined) {
       switch (defaultLanguage) {
         case 'chinese':
           defaultLanguage = 'pinyin';
@@ -140,29 +140,34 @@
     }
   }
 
-  function editCardClickHandler() {
-    if ($('#edit-card-area').css('display')=='none') {
+  function toggleEditDialog() {
+    if ($('#edit-card-dialog').css('display')=='none') {
+      // show dialog
       $("#display-word").css("display","none");
-      $("#edit-card-area").css("display","block");
+      $('#edit-card-dialog').css('display','block');
+      $('#background-mask').css('display','block');
+      $('#edit-english-field').focus();
     } else {
+      // hide dialog
       $("#display-word").css("display","block");
-      $("#edit-card-area").css("display","none");
+      $("#edit-card-dialog").css("display","none");
+      $('#background-mask').css('display','none');
     }
   }
 
   function updateCardHandler() {
+    var editedCardPos = deckPos;
     $.ajax({
-        url: '/api/words/' + deck.cards[deckPos].wid, 
+        url: '/api/words/' + deck.cards[editedCardPos].wid, 
         method: 'PUT', 
         data: {
           'english': $('#edit-english-field').val().toLowerCase(),
           'chinese': $('#edit-chinese-field').val()
         },
         success: function() {
-          $.get('/api/words/'+deck.cards[deckPos].wid, function(results) {
-            deck.cards[deckPos] = results[0];
-            $("#display-word").css("display","block");
-            $("#edit-card-area").css("display","none");
+          $.get('/api/words/'+deck.cards[editedCardPos].wid, function(results) {
+            deck.cards[editedCardPos] = results[0];
+            toggleEditDialog();
             displayLanguage = defaultLanguage;
             updateDisplay();
           });
@@ -174,20 +179,25 @@
     loadDeck();
 
     $('.flash-card-word').click(flipCard);
-    $('#prev-word').click(function() { changeCard(next=false); });
-    $('#next-word').click(function() { changeCard(next=true); });
-    $('#language-button').click(function() { changeLanguage(''); });
+    $('#prev-word').click(changeCard);
+    $('#next-word').click(changeCard);
+    $('#language-button').click(changeLanguage);
     $('#reload-button').click(loadDeck);
     $('#shuffle-button').click(shuffleDeck);
     $('#remove-card-button').click(popCard);
-    $('#edit-card-button').click(editCardClickHandler);
+    $('#edit-card-button').click(toggleEditDialog);
     $('#save-edits-button').click(updateCardHandler);
+    $('#cancel-edits-button').click(toggleEditDialog);
   });
 
-  $(document).keyup(function(e) {
-    if ($('#edit-card-area').css('display')=='none') {
+  $(document).keydown(function(e) {
+    if ($('#edit-card-dialog').css('display')=='none') {
+      console.log(e);
       if (e.ctrlKey) {
         switch (e.which) {
+          case 13: // enter
+            toggleEditDialog();
+            break;
           case 82: // r
             loadDeck();
             break;
@@ -230,6 +240,21 @@
             return;
         }
       }
+    } else {
+      // edit card dialog
+      if (e.ctrlKey) {
+      switch (e.which) {
+          case 13: // enter
+            toggleEditDialog();
+            break;
+        }
+      } else {
+      switch (e.which) {
+          case 27: // esc
+            toggleEditDialog();
+            break;
+        }
+      }
     }
   });
 </script>
@@ -245,13 +270,15 @@
   <div id="flash-card" class="flash-card">
     <span id="prev-word" class="navigation-button-prev"></span>
     <span id="next-word" class="navigation-button-next"></span>
+    <div id="edit-card-dialog" class="flash-card-dialog" style="display: none;">
+      <input id="edit-english-field" class="edit-card-field" name="english" type="text" value=""><br>
+      <input id="edit-chinese-field" class="edit-card-field" name="chinese" type="text" value=""><br>
+      <input id="save-edits-button" class="edit-card-button" type="submit" value="Save">
+      <input id="cancel-edits-button" class="edit-card-button" type="submit" value="Cancel">
+    </div>
+    <div id="background-mask" class="background-mask"></div>
     <div class="flash-card-word">
       <span id="display-word" class="translation"></span>
-      <div id="edit-card-area" class="flash-card-editor" style="display: none;">
-        <input id="edit-english-field" class="edit-card-field" name="english" type="text" value=""><br>
-        <input id="edit-chinese-field" class="edit-card-field" name="chinese" type="text" value=""><br>
-        <input id="save-edits-button" class="edit-card-button" type="submit" value="Save">
-      </div>
     </div>
     <div class="card-status-bar">
       <div class="stats">

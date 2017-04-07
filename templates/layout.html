@@ -5,26 +5,25 @@
     <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
     <script src="{{ url_for('static', filename='js/jquery-3.2.0.min.js') }}">
     </script>
-  </head>
-  <body>
     {% block scripts %}
     {% endblock %}
-    
+  </head>
+  <body>
     <main class="container">
-    <div class="title-bar">
-      <span class="title-bar-title"><a href="{{ url_for('root') }}">Fireplace Flashcards</a></span>
-      <!-- vocab list -->
-      <a href="{{ url_for('viewAll') }}">
-        <span id="vocabulary-button" class="button title-bar-button">vocabulary</span>
-      </a>
-      {% block title %}
-      {% endblock %}
-    </div>
-    <div class="content">
-    {% block content %}
-    {% endblock %}
-    </div>
+    <div id="background-mask" class="background-mask"></div>
+      <div class="title-bar">
+        <span class="title-bar-title"><a href="{{ url_for('root') }}">Fireplace Flashcards</a></span>
+        <!-- vocab list -->
+        <a href="{{ url_for('viewAll') }}">
+          <span id="vocabulary-button" class="button title-bar-button">vocabulary</span>
+        </a>
+        {% block title %}
+        {% endblock %}
+      </div>
+      <div class="content">
+        {% block content %}
+        {% endblock %}
+      </div>
     </main>
-    
   </body>
 </html>

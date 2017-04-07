@@ -58,7 +58,7 @@ class Deck(db.Model):
 		self.uid = ownerId
 
 	def serialize(self):
-		deckcards = DeckCard.query.filter_by(did=self.did)
+		deckcards = DeckCard.query.filter_by(did=self.did).order_by('wid')
 		cards = [Word.query.filter_by(wid=c.wid).first() for c in deckcards]
 		return {
 			'did': self.did,
@@ -68,7 +68,7 @@ class Deck(db.Model):
 		}
 
 class DeckCard(db.Model):
-	__tablename__ = "deckwords"
+	__tablename__ = "deckcards"
 	dwid = db.Column(db.Integer, primary_key = True)
 	did = db.Column(db.Integer, db.ForeignKey('decks.did'))
 	wid = db.Column(db.Integer, db.ForeignKey('words.wid'))
