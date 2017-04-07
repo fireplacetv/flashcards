@@ -135,8 +135,10 @@ body {
 }
 
 .edit-card-button {
-  font-size: 48pt;
+  font-size: 36pt;
   border: 1pt black solid;
+  cursor: pointer;
+  margin: 1% 2%;
 }
 
 /* Vocabulary List */

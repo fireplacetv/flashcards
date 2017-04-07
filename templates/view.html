@@ -86,12 +86,20 @@
     updateDisplay();
   };
 
-  function changeCard(next) {
-    if (next || next == undefined) {
-      deckPos = (deckPos + 1) % deck.cards.length;
-    } else {
-      deckPos = (deckPos + deck.cards.length - 1) % deck.cards.length;
+  function nextCardHandler() {
+    advanceCard(1);
+  }
+
+  function prevCardHandler() {
+    advanceCard(-1);
+  }
+
+  function advanceCard(difference) {
+    if (difference < 0) {
+      difference = -(Math.abs(difference) % deck.cards.length);
     }
+
+    deckPos = (deckPos + deck.cards.length + difference) % deck.cards.length;
     displayLanguage = defaultLanguage;
     updateDisplay();
   }
@@ -179,8 +187,8 @@
     loadDeck();
 
     $('.flash-card-word').click(flipCard);
-    $('#prev-word').click(changeCard);
-    $('#next-word').click(changeCard);
+    $('#prev-word').click(prevCardHandler);
+    $('#next-word').click(nextCardHandler);
     $('#language-button').click(changeLanguage);
     $('#reload-button').click(loadDeck);
     $('#shuffle-button').click(shuffleDeck);
@@ -225,10 +233,10 @@
       } else {
         switch (e.which) {
           case 37: // left
-            changeCard(next=false);
+            advanceCard(-1);
             break;
           case 39: // right
-            changeCard(next=true);
+            advanceCard(1);
             break;
           case 38: // up
             flipCard(reverse=true);
