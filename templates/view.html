@@ -97,7 +97,7 @@
   }
 
   function changeLanguage(newLanguage) {
-    if (newLanguage == '' || newLanguage==undefined) {
+    if (newLanguage == '' || newLanguage.which) {
       switch (defaultLanguage) {
         case 'chinese':
           defaultLanguage = 'pinyin';
@@ -276,7 +276,6 @@
       <input id="save-edits-button" class="edit-card-button" type="submit" value="Save">
       <input id="cancel-edits-button" class="edit-card-button" type="submit" value="Cancel">
     </div>
-    <div id="background-mask" class="background-mask"></div>
     <div class="flash-card-word">
       <span id="display-word" class="translation"></span>
     </div>
